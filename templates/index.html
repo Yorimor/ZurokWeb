@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    <div id="heading"><div>Welcome!</div></div>
+    <div class="welcome">
+        <div><img class="profile-img" src="https://cdn.discordapp.com/avatars/220497983576211456/89921434570cfd05a47fc740726c5b80.png"></div>
+        <p>
+            This site is for any Zur'ok related tools and utilities, as well as any other generator or tools I make.<br/><br/>
+            While there is not much here currently, the available tools should provide some usefulness.<br/><br/>
+            {%- if current_user.is_authenticated -%}Any ideas or issues with the site, send them to me on discord :)<br/><br/>
+            The old version will still exist at <a href="https://old.zurok.net">old.zurok.net</a>, and some links will take you there while everything is updated.
+            {%- else -%}{%- endif -%}
+        </p>
+    </div>
+    <div class="rows col2">
+        {%- if has_permission("quotes.view") -%}<div class="tile">
+            <a class="header" href="{{ url_for("quotes_home") }}">Quotes</a>
+            <p>Here you can view your own quotes and quotes you have with other users.<br/><br/>
+            You can also disable any of those quotes, which prevents them from showing up with the ?quote command.<br/><br/>
+            And there is a now leaderboard to show the top five quoted users!
+            </p>
+        </div>{%- endif -%}
+        <div class="tile">
+            <p>More stuff coming soon-ish!</p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<style>body { overflow-y: scroll; }</style>
+<div id="heading"><div>Quotes</div></div>
+<div>
+    <table id="quotes">
+        <thead>
+            <tr>
+                <th id="qCount"></th>
+                <th><wa-input id="search" placeholder="Search Quotes" clearable size="small"></wa-input></th>
+                <th><i class="fa-regular fa-calendar-days"></i></th>
+                <th><wa-dropdown id="userFilter">
+                        <wa-button slot="trigger" size="small" variant="brand" caret><i class="fa-solid fa-users"></i></wa-button>
+                        <wa-menu size="small" variant="brand" id="userFilterMenu">{% set max_users = 1 %}
+                            <wa-menu-item type="checkbox" size="small" checked>1</wa-menu-item>
+                            <wa-menu-item type="checkbox" size="small" checked>2</wa-menu-item>
+                            <wa-menu-item type="checkbox" size="small" checked>3</wa-menu-item>
+                            <wa-menu-item type="checkbox" size="small" checked>4</wa-menu-item>
+                        </wa-menu>
+                    </wa-dropdown></th>
+                <th><i class="fa-solid fa-xmark"></i></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in quotes %}<tr id="{{ q.id }}">
+                <td>{{ loop.index }}</td>
+                <td>{% for x in range(q.quotes|length) %}
+                    > {{ q.quotes[x] }} &mdash; <i>*{{ get_username(q.users[x]) }}*</i>{% if not loop.last %}<br/>{% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ q.dt.strftime("%d/%m/%Y %H:%M") }}</td>
+                <td>{{ q.users|unique|list|length }}{% set max_users = [max_users, q.users|unique|list|length]|max %}</td>
+                <td>{%- if has_permission("quotes.hide") -%}<wa-button size="small" variant="danger">Hide</wa-button>{%- endif -%}</td>
+            </tr>
+            {% endfor %}
+            <tr id="noQuotes" class="hidden">
+                <td></td>
+                <td><h4><b>No quotes found!</b></h4></td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+<div id="download-links"><a href="{{ url_for("quotes_csv") }}">Download csv</a></div>
+</div>
+    <script>let max_users = {{ max_users }};</script>
+    <script src="{{ url_for("static", filename="js/quotes.js") }}"></script>
+{% endblock %}

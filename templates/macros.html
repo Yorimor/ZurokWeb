@@ -1,0 +1,16 @@
+{%- macro navlink(nav, name, route) -%}<a {% if nav==name %}class="active"{% endif %} href="{{ route }}">{{ name }}</a>{%- endmacro -%}
+
+{%- macro navlinks(nav) -%}
+    {{ navlink(nav, "home", url_for("index")) }}
+    {%- if has_permission("quotes.view") -%}{{ navlink(nav, "quotes", url_for("quotes_home")) }}{%- endif -%}
+    {%- if has_permission("calendar.view") -%}{{ navlink(nav, "calendar", url_for("calendar_home")) }}{%- endif -%}
+    {%- if has_permission("admin.view") -%}{{ navlink(nav, "admin", url_for("admin_home")) }}{%- endif -%}
+{%- endmacro -%}
+
+{%- macro sublinks(nav, subnav) -%}
+{%- if nav == "quotes" -%}
+    {%- if has_permission("quotes.view") -%}{{ navlink(subnav, "quotes", url_for("quotes_home")) }}{%- endif -%}
+    {%- if has_permission("quotes.view") -%}{{ navlink(subnav, "board", url_for("quotes_board")) }}{%- endif -%}
+    {%- if has_permission("quotes.admin") -%}{{ navlink(subnav, "admin", url_for("quotes_admin")) }}{%- endif -%}
+{%- endif -%}
+{%- endmacro -%}

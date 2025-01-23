@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+    #calendar {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        align-content: flex-start;
+    }
+
+    .month-box {
+        display: block;
+        flex-basis: 25%;
+        align-self: auto;
+    }
+    .month-box > h3 {
+        text-align: center;
+        width: 100%;
+    }
+
+    @media only screen and (max-width : 1200px) {
+        .month-box {
+            flex-basis: 30%;
+        }
+    }
+
+    @media only screen and (max-width : 1100px) {
+        .month-box {
+            flex-basis: 40%;
+        }
+    }
+
+    @media only screen and (max-width : 1000px) {
+        .month-box {
+            flex-basis: 50%;
+        }
+    }
+
+    @media only screen and (max-width : 700px) {
+        .month-box {
+            flex-basis: 100%;
+        }
+    }
+
+    .month {
+        display: inline-flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        align-content: flex-end;
+        border-radius: 5px;
+        padding: 5px;
+        column-gap: 2px;
+        row-gap: 2px;
+    }
+    .day {
+        flex-basis: calc(100%/8);
+        text-align: center;
+        width: calc(100%/7 - 2px);
+        aspect-ratio: 1 / 1;
+        border: var(--main-color) 1px solid;
+        border-radius: 25%;
+        line-height: 2.5em;
+        cursor: pointer;
+        user-select: none;
+    }
+    .day.name {
+        border: none;
+        margin: 1px;
+        cursor: default;
+        border-bottom: white 1px solid;
+        border-radius: 0;
+    }
+    .now {
+        text-decoration: underline;
+    }
+    .day.none {
+        border: none;
+        margin: 1px;
+        color: transparent;
+        cursor: default;
+    }
+    .day.test {
+        background: aliceblue;
+        color: black;
+    }
+    .day.work {
+        color: black;
+        background: grey;
+    }
+    .day.ot {
+        color: black;
+        background: darkorange;
+    }
+    .day.vaca {
+        color: black;
+        background: green;
+    }
+    .day.sick {
+        color: black;
+        background: yellow;
+    }
+    #menu {
+        width: 100%;
+        text-align: center;
+    }
+    #menuButtons {
+        border: 2px var(--main-color) solid;
+        border-radius: 8px;
+    }
+    #stats {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        column-gap: 20px;
+        padding: 20px;
+    }
+    </style>
+    <div id="heading">
+        <div><a href="{{ url_for("calendar_home", year=year-1) }}">{{ year-1 }}</a></div>
+        <div></div>
+        <div>{{ year }}</div>
+        <div></div>
+        <div><a href="{{ url_for("calendar_home", year=year+1) }}">{{ year+1 }}</a></div>
+    </div>
+    <div id="menu">
+        <wa-button-group id="menuButtons">
+            <wa-button data-mode="work" id="workBtn" variant="brand">Work</wa-button>
+            <wa-button data-mode="ot" id="otBtn">OT</wa-button>
+            <wa-button data-mode="sick" id="sickBtn">Sick</wa-button>
+            <wa-button data-mode="vaca" id="vacaBtn">Vaca</wa-button>
+        </wa-button-group>
+    </div>
+    <div id="stats">
+        <div id="workStats"></div>
+        <div id="sickStats"></div>
+        <div id="vacaStats"></div>
+    </div>
+    <div id="calendar">
+    {%- for month in months -%}
+        {% set month_i = loop.index %}
+        <div class="month-box"><h3>{{ m_names[month_i] }}</h3><div class="month">
+            {%- for day in ["M", "T", "W", "T", "F", "S", "S"] -%}<div class="day name">{{ day }}</div>{%- endfor -%}
+            {%- for week in month -%}{%- for day in week -%}
+                {% set day_data = data.days.get(month_i|string, {}).get(day|string, "") %}
+                <div class="day {% if day == 0 %}none{% elif day == now.day and month_i == now.month and year == now.year %}{% endif %}{{ day_data }}" data-mode="{{ day_data }}" data-day="{{ day }}" data-month="{{ month_i }}">{{ day }}</div>
+            {%- endfor -%}{%- endfor -%}</div></div>
+    {%- endfor -%}
+    </div>
+    <script>
+    let mode = "work";
+    const btns = document.querySelectorAll("#menuButtons>wa-button");
+
+    for (let i = 0; i < btns.length; i++)
+    {
+        btns[i].addEventListener("click", ()=>{
+            mode = btns[i].dataset.mode;
+            for (let j = 0; j < btns.length; j++) {
+                btns[j].variant = "neutral";
+                if (i === j) { btns[j].variant = "brand"; }
+            }
+        });
+    }
+
+    let counts = {};
+
+    const days = document.querySelectorAll(".day:not(.name):not(.none)");
+    for (let i = 0; i < days.length; i++)
+    {
+        days[i].addEventListener("click", ()=>{
+            if (days[i].classList.contains(mode)) {
+                days[i].classList.remove(mode);
+                days[i].dataset.mode = "";
+                updateDay(days[i].dataset.day, days[i].dataset.month, "");
+            }
+            else {
+                days[i].className = "day " + mode;
+                days[i].dataset.mode = mode;
+                updateDay(days[i].dataset.day, days[i].dataset.month, mode);
+            }
+            updateCounts();
+        });
+    }
+
+    const workStats = document.querySelector("#workStats");
+    const sickStats = document.querySelector("#sickStats");
+    const vacaStats = document.querySelector("#vacaStats");
+
+    function updateCounts() {
+        counts = {};
+        for (let i = 0; i < days.length; i++) {
+            counts[days[i].dataset.mode] = (counts[days[i].dataset.mode] ?? 0) + 1;
+        }
+
+        workStats.innerText = "Worked: " + ((counts["work"] ?? 0) + (counts["ot"] ?? 0)).toString();
+        sickStats.innerText = "Sick Days: " + (counts["sick"] ?? 0).toString();
+        vacaStats.innerText = "Vaca Used: " + (counts["vaca"] ?? 0).toString() + " / 20";
+    }
+    updateCounts();
+
+    function updateDay(_day, _month, _mode) {
+        fetch("{{url_for("calendar_update_day")}}", {
+            method: "POST",
+            body: JSON.stringify({
+                day: _day,
+                month: _month,
+                year: {{ year }},
+                mode: _mode
+            }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        });
+    }
+    </script>
+{% endblock %}

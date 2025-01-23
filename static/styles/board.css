@@ -1,0 +1,25 @@
+.board {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    width: 100%;
+}
+.board > div, .board > h1 {
+    text-align: center;
+}
+.board > h1 {
+    font-size: x-large;
+    text-decoration: underline;
+}
+.score-1 {
+    font-size: 3.5em;
+    margin-bottom: 25px;
+}
+.score-2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+.score-3, .score-4, .score-5 {
+    font-size: 1.5em;
+}

@@ -1,0 +1,13 @@
+:root,
+:host,
+.wa-theme-default-light {
+  --wa-color-brand-fill-quiet: var(--main-color);
+  --wa-color-brand-fill-normal: var(--main-color);
+  --wa-color-brand-fill-loud: var(--main-color);
+  --wa-color-brand-border-quiet:var(--main-color);
+  --wa-color-brand-border-normal: var(--main-color);
+  --wa-color-brand-border-loud: var(--main-color);
+  --wa-color-brand-on-quiet: white;
+  --wa-color-brand-on-normal: white;
+  --wa-color-brand-on-loud: white;
+}

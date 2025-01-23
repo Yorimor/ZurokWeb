@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/board.css') }}">
+{% endblock %}
+{% block content %}
+<div id="heading"><div>Quotes Leader Board</div></div>
+<div id="container" class="box">
+    <hr/>{% for tag in scores %}
+        <div class="board">
+        <h1>{{ guilds[tag] }}</h1>
+        {% set user_items = scores[tag].items()|list %}
+        {% for user, score in user_items[:5] %}
+            <div class="score-{{ loop.index }}">{% if loop.index == 1 %}<i class="fa-solid fa-medal"></i> {% endif %}{{ user }} - {{ score }} quotes</div>
+        {% endfor %}
+        </div><hr/>
+    {% endfor %}
+    </div>
+{% endblock %}

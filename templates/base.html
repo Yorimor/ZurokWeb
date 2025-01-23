@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% from "macros.html" import navlinks, navlink, sublinks %}
+<html lang="en" >
+<head>
+    <meta charset="UTF-8">
+    <title>zurok.net</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for("static", filename="favicon-z.ico") }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.2/dist/themes/default.css" />
+    <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.2/dist/webawesome.loader.js"></script>
+
+    <script src="https://kit.fontawesome.com/7f33ed778c.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/wa-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main-style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div id="alerts">
+    </div>
+    <div id="header">
+        <div id="title">
+            <div>Zur'ok</div>
+        </div>
+        <div id="navbar">
+            {{ navlinks(nav) }}
+        </div>
+        <div id="user">
+            {% if current_user.is_authenticated %}<a href="#">{{ current_user.display_name[:10] }}{% if current_user.display_name|length > 10 %}...{% endif %}</a>
+                <a href="{{ url_for("logout") }}"><i class="fa-solid fa-right-from-bracket"></i></a>
+            {% else %}<a href="{{ url_for("login") }}">Login</a>{% endif %}
+        </div>
+    </div>
+    <div id="scrollnav">{{ navlinks(nav) }}</div>
+    <div id="background">
+        <div id="content">
+            <div id="subnav">{% if subnav %}{{ sublinks(nav, subnav) }}{% endif %}</div>
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    <footer>
+        <div>©2016-{{ now.year }} - yorimor - All Rights Reserved</div>
+    </footer>
+</body>
+<script src="{{ url_for("static", filename="js/alerts.js") }}"></script>
+</html>
